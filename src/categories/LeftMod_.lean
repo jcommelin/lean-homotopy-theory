@@ -52,11 +52,30 @@ def zero_module : R-Mod :=
 
 end zm
 
-instance zero_module_is_initial : @has_initial_object (R-Mod) foo := -- why can't Lean find this instance?
+instance zero_module_is_initial : @has_initial_object (R-Mod) LeftMod_.foo :=
 { initial_object :=
 { ob := zero_module,
   is_initial_object :=
   begin
+    constructor,
+    intro M,
+    constructor,
+    refl,
+    constructor,
+    swap 3,
+    intro f, exact trivial,
+    intro triv,
+    constructor,
+    swap 2,
+    intro z, exact 0,
+    exact is_linear_map.map_zero,
+    tidy,
+    dsimp [function.left_inverse],
+    intro f,
+    apply subtype.eq,
+    funext x,
+    simp,
+    tidy,
     sorry
   end
 } }
