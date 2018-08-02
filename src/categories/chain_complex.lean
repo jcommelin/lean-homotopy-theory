@@ -22,4 +22,3 @@ instance : category Ch :=
 { Hom := λ K K', K.val ⟶ K'.val,
   identity := λ K, 𝟙 K.val,
   compose := λ _ _ _ f g, f ⊟ g }
-
