@@ -1,6 +1,7 @@
 import algebra.module
 
 import categories.category
+import categories.colimits
 import categories.Ring
 
 open categories
@@ -30,9 +31,34 @@ instance {M N : R-Mod} : has_coe_to_fun (module_hom M N) :=
 -- instance {M N : R-Mod} (f : module_hom M N) : is_linear_map f.val := f.property
 -- fails: is_linear_map is not a class
 
-instance : category (R-Mod) :=
+instance foo : category (R-Mod) :=
 { Hom := module_hom,
   identity := λ R, ⟨id, is_linear_map.id⟩,
   compose := λ _ _ _ f g, ⟨g.val ∘ f.val, is_linear_map.comp g.property f.property⟩ }
+
+section zm
+
+open punit
+
+def zero_module : R-Mod :=
+{ carrier := punit,
+  is_a_module :=
+  by refine
+  { smul := λ _ _, star,
+    zero := star,
+    add  := λ _ _, star,
+    neg  := λ _, star,
+    .. }; finish }
+
+end zm
+
+instance zero_module_is_initial : @has_initial_object (R-Mod) foo := -- why can't Lean find this instance?
+{ initial_object :=
+{ ob := zero_module,
+  is_initial_object :=
+  begin
+    sorry
+  end
+} }
 
 end LeftMod_
