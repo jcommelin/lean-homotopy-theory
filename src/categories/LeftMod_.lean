@@ -1,7 +1,9 @@
 import algebra.module
+import group_theory.subgroup
 
 import categories.category
-import categories.colimits
+import categories.universal.instances
+import categories.universal.kernels
 import categories.Ring
 
 open categories
@@ -58,23 +60,55 @@ lemma zero_is_star : (0 : (zero_module R)) = star := rfl
 
 end zm
 
-instance zero_module_is_initial : @has_initial_object (R-Mod) LeftMod_.foo :=
-{ initial_object :=
-{ ob := zero_module R,
-  is_initial_object :=
-  ⟨λ M : R-Mod, ⟨ ⟨
-    λ _, trivial,
-    λ _, ⟨λ _, 0, is_linear_map.map_zero ⟩,
-    begin
-      dsimp [function.left_inverse],
-      tidy,
-      rw ← zero_is_star,
-      apply (is_linear_map.zero (by assumption)).symm
-    end,
-    begin
-      dsimp [function.right_inverse, function.left_inverse],
-      finish
-    end ⟩, by refl ⟩ ⟩
+instance LeftMod__has_ZeroObject : @universal.has_ZeroObject (R-Mod) LeftMod_.foo :=
+{ zero_object :=
+{ zero_object := zero_module R,
+  is_initial  := ⟨λ M : R-Mod, ⟨λ _, 0, is_linear_map.map_zero⟩,
+  begin
+    intros M f g,
+    tidy,
+    rw [← zero_is_star, is_linear_map.zero f_property, is_linear_map.zero g_property]
+  end ⟩,
+  is_terminal :=
+  begin
+    obviously'
+  end
 } }
+
+instance LeftMod__has_BinaryProducts : @universal.has_BinaryProducts (R-Mod) LeftMod_.foo :=
+{ binary_product := λ M N : R-Mod,
+⟨ ⟨ ↥M × ↥N,
+begin
+  refine
+  {
+    smul := λ r p, (r • p.1, r • p.2),
+    zero := (0, 0),
+    add := λ p q, (p.1 + q.1, p.2 + q.2),
+    neg := λ p, (-p.1, -p.2),
+    ..
+  }; try { simp }; intros; sorry
+end
+ ⟩,
+  ⟨ prod.fst, by obviously ⟩,
+  ⟨ prod.snd, by obviously ⟩,
+  λ T f g, ⟨λ t, (f t, g t), sorry ⟩,
+  sorry, sorry, sorry
+  -- by obviously',  -- these work, but timeout
+  -- by obviously,
+  -- by obviously
+⟩
+
+}
+
+-- instance LeftMod__has_Kernels : @universal.has_Kernels (R-Mod) LeftMod_.foo (by apply_instance) :=
+-- { kernel := λ M N f,
+-- ⟨ ⟨ f ⁻¹' {0}, sorry ⟩,
+--   ⟨ subtype.val, sorry ⟩,
+--   λ T k h, sorry,
+--   sorry,
+--   sorry,
+--   by obviously
+-- ⟩
+-- }
 
 end LeftMod_
